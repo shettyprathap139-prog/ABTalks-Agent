@@ -21,40 +21,59 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-
 DEMO_AGENT_ID = "demo-abtalks-agent"
 
 
-def setup_and_restore_agent():
+def setup_demo_agent():
     connection = get_connection()
     cursor = connection.cursor()
 
-    # Check whether any agents exist
-    cursor.execute("SELECT COUNT(*) AS count FROM agents")
-    count = cursor.fetchone()["count"]
+    # Make sure the demo agent exists
+    cursor.execute(
+        """
+        SELECT agent_id, name, domain
+        FROM agents
+        WHERE agent_id = ?
+        """,
+        (DEMO_AGENT_ID,)
+    )
 
-    if count == 0:
-        # Create permanent demo agent
-        created_at = datetime.now(timezone.utc).isoformat()
+    agent = cursor.fetchone()
 
+    if not agent:
         cursor.execute(
             """
-            INSERT INTO agents (agent_id, name, domain, created_at)
+            INSERT INTO agents
+            (agent_id, name, domain, created_at)
             VALUES (?, ?, ?, ?)
             """,
             (
                 DEMO_AGENT_ID,
                 "Alex",
                 "AI Security",
-                created_at
+                datetime.now(timezone.utc).isoformat()
             )
         )
 
-        # Seed demo posts so judges immediately see content
+        print("Demo agent created.")
+
+    # Make sure the demo agent has posts
+    cursor.execute(
+        """
+        SELECT COUNT(*) AS count
+        FROM posts
+        WHERE agent_id = ?
+        """,
+        (DEMO_AGENT_ID,)
+    )
+
+    post_count = cursor.fetchone()["count"]
+
+    if post_count == 0:
         demo_posts = [
             (
                 "AI security requires protecting not only AI models, but also the infrastructure used to evaluate and deploy them. Secure testing environments, strong isolation, telemetry, and careful access controls are becoming essential as AI systems gain more powerful capabilities.",
-                "AI security is increasingly dependent on securing the infrastructure surrounding AI systems, not just the models themselves.",
+                "AI security increasingly depends on securing the infrastructure surrounding AI systems, not just the models themselves.",
                 [
                     "https://openai.com/index/third-party-cyber-evaluations-involving-openai-models"
                 ]
@@ -85,46 +104,25 @@ def setup_and_restore_agent():
                 )
             )
 
-        connection.commit()
+        print("Demo posts created:", len(demo_posts))
 
-        print("==========================================")
-        print("DEMO AGENT CREATED")
-        print(f"Agent ID: {DEMO_AGENT_ID}")
-        print("Demo posts created: 2")
-        print("==========================================")
-
-    # Restore the newest existing agent after a restart
-    cursor.execute(
-        """
-        SELECT agent_id, name, domain
-        FROM agents
-        ORDER BY created_at DESC
-        LIMIT 1
-        """
-    )
-
-    agent = cursor.fetchone()
+    connection.commit()
     connection.close()
 
-    if agent:
-        persona = {
-            "name": agent["name"],
-            "domain": agent["domain"]
+    # Start the demo agent
+    start_agent(
+        DEMO_AGENT_ID,
+        {
+            "name": "Alex",
+            "domain": "AI Security"
         }
+    )
 
-        print(
-            f"Restoring agent {agent['agent_id']} "
-            f"({agent['domain']})"
-        )
-
-        start_agent(
-            agent["agent_id"],
-            persona
-        )
+    print("Demo agent running:", DEMO_AGENT_ID)
 
 
 initialize_database()
-setup_and_restore_agent()
+setup_demo_agent()
 
 app.include_router(agent_router)
 

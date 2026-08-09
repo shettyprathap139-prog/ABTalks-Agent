@@ -2,6 +2,8 @@ const $ = (id) => document.getElementById(id);
 
 const DEMO_AGENT_ID = "00000000-0000-0000-0000-000000000001";
 
+ const DEMO_AGENT_ID = "demo-abtalks-agent";
+
 const state = {
   agentId: DEMO_AGENT_ID,
   apiBase:
