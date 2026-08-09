@@ -1,20 +1,12 @@
 const $ = (id) => document.getElementById(id);
 
 const DEMO_AGENT_ID = "demo-abtalks-agent";
-const OLD_DEFAULT_ID = "00000000-0000-0000-0000-000000000001";
-
-const savedAgentId = localStorage.getItem("abtalks_agent_id");
 
 const state = {
-  agentId:
-    savedAgentId && savedAgentId !== OLD_DEFAULT_ID
-      ? savedAgentId
-      : DEMO_AGENT_ID,
-
-  apiBase:
-    localStorage.getItem("abtalks_api_base") ||
-    "https://abtalks-agent-y2jf.onrender.com",
+  agentId: DEMO_AGENT_ID,
+  apiBase: "https://abtalks-agent-y2jf.onrender.com",
 };
+
 $("apiBase").value = state.apiBase;
 
 function apiBase() {
