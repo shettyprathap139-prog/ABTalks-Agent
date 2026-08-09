@@ -1,10 +1,13 @@
 const $ = (id) => document.getElementById(id);
 
-const state = {
-  agentId: localStorage.getItem("abtalks_agent_id") || "",
-  apiBase: localStorage.getItem("abtalks_api_base") || "https://abtalks-agent-y2jf.onrender.com",
-};
+const DEMO_AGENT_ID = "00000000-0000-0000-0000-000000000001";
 
+const state = {
+  agentId: DEMO_AGENT_ID,
+  apiBase:
+    localStorage.getItem("abtalks_api_base") ||
+    "https://abtalks-agent-y2jf.onrender.com",
+};
 $("apiBase").value = state.apiBase;
 
 function apiBase() {
