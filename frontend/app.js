@@ -178,8 +178,11 @@ async function refreshFeed() {
 
   try {
     const response = await fetch(
-      `${apiBase()}/api/agent/feed?agentId=${encodeURIComponent(state.agentId)}`
-    );
+  `${apiBase()}/api/agent/feed?agentId=${encodeURIComponent(state.agentId)}&_=${Date.now()}`,
+  {
+    cache: "no-store"
+  }
+);
 
     const data = await response.json();
 
