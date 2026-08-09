@@ -2,7 +2,7 @@ const $ = (id) => document.getElementById(id);
 
 const state = {
   agentId: localStorage.getItem("abtalks_agent_id") || "",
-  apiBase: localStorage.getItem("abtalks_api_base") || "http://127.0.0.1:8000",
+  apiBase: localStorage.getItem("abtalks_api_base") || "https://abtalks-agent-y2jf.onrender.com",
 };
 
 $("apiBase").value = state.apiBase;
