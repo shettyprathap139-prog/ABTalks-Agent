@@ -2,13 +2,12 @@ import os
 import time
 
 from dotenv import load_dotenv
-from google import genai
-
+from groq import Groq
 
 load_dotenv()
 
-client = genai.Client(
-    api_key=os.getenv("GEMINI_API_KEY")
+client = Groq(
+    api_key=os.getenv("GROQ_API_KEY")
 )
 
 
@@ -17,49 +16,40 @@ def ask_ai(prompt, retries=2):
     for attempt in range(retries + 1):
 
         try:
-            response = client.models.generate_content(
-                model="gemini-3.6-flash",
-                contents=prompt
+            response = client.chat.completions.create(
+                model="openai/gpt-oss-20b",
+                messages=[
+                    {
+                        "role": "user",
+                        "content": prompt
+                    }
+                ],
+                temperature=0.3,
             )
 
-            if not response.text:
-                raise RuntimeError("Gemini returned an empty response.")
+            text = response.choices[0].message.content
 
-            return response.text
+            if not text:
+                raise RuntimeError(
+                    "Groq returned an empty response."
+                )
+
+            return text
 
         except Exception as error:
 
-            error_text = str(error)
+            print(f"Groq request failed: {error}")
 
-            # Gemini quota/rate-limit error
-            if "429" in error_text or "RESOURCE_EXHAUSTED" in error_text:
-                print("Gemini quota/rate limit reached.")
-
-                if attempt < retries:
-                    wait_time = 10 * (attempt + 1)
-
-                    print(
-                        f"Retrying Gemini request in {wait_time} seconds..."
-                    )
-
-                    time.sleep(wait_time)
-                    continue
-
-                raise RuntimeError(
-                    "Gemini quota is currently exhausted."
-                )
-
-            # Other temporary/API errors
             if attempt < retries:
-
                 wait_time = 5 * (attempt + 1)
 
                 print(
-                    f"Gemini request failed. "
-                    f"Retrying in {wait_time} seconds..."
+                    f"Retrying Groq request in {wait_time} seconds..."
                 )
 
                 time.sleep(wait_time)
                 continue
 
-            raise
+            raise RuntimeError(
+                f"Groq request failed: {error}"
+            )
