@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ABTalks Agent</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <div>
+        <div class="brand">ABTalks Agent</div>
+        <div class="subtitle">Autonomous AI Security Intelligence</div>
+      </div>
+      <div id="connectionBadge" class="badge offline">● Backend offline</div>
+    </header>
+
+    <main class="container">
+      <section class="hero">
+        <div>
+          <p class="eyebrow">AI SECURITY AGENT</p>
+          <h1>Turn security news into intelligent posts.</h1>
+          <p class="hero-text">
+            Your autonomous agent collects recent security news, filters it,
+            ranks relevant stories, generates a post and stores the result.
+          </p>
+        </div>
+        <div class="hero-icon">AI</div>
+      </section>
+
+      <section class="grid two">
+        <div class="card">
+          <div class="card-title">Agent setup</div>
+
+          <label for="apiBase">Backend URL</label>
+          <input id="apiBase" value="http://127.0.0.1:8000" />
+
+          <label for="personaName">Persona name</label>
+          <input id="personaName" value="Alex" />
+
+          <label for="personaDomain">Domain</label>
+          <input id="personaDomain" value="AI Security" />
+
+          <button id="initBtn" class="primary">Initialize Agent</button>
+          <button id="refreshBtn" class="secondary">Refresh Feed</button>
+
+          <div id="agentInfo" class="agent-info hidden"></div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">Agent status</div>
+
+          <div class="status-row">
+            <span>Status</span>
+            <strong id="statusText">Not initialized</strong>
+          </div>
+          <div class="status-row">
+            <span>Agent ID</span>
+            <code id="agentIdText">—</code>
+          </div>
+          <div class="status-row">
+            <span>Posts</span>
+            <strong id="postCount">0</strong>
+          </div>
+          <div class="status-row">
+            <span>Last refresh</span>
+            <strong id="lastRefresh">—</strong>
+          </div>
+
+          <div id="message" class="message">Initialize an agent to load its feed.</div>
+        </div>
+      </section>
+
+      <section class="feed-section">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">AGENT FEED</p>
+            <h2>Generated security posts</h2>
+          </div>
+          <button id="refreshTopBtn" class="secondary small">↻ Refresh</button>
+        </div>
+
+        <div id="loading" class="loading hidden">Loading posts...</div>
+        <div id="emptyState" class="empty">
+          No posts yet. Initialize the agent and refresh the feed.
+        </div>
+        <div id="feed" class="feed"></div>
+      </section>
+    </main>
+
+    <footer>
+      <span>ABTalks Agent</span>
+      <span>AI Security • Autonomous Publishing</span>
+    </footer>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
