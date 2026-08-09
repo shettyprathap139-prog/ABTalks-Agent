@@ -12,39 +12,59 @@ from app.database.database import get_connection
 router = APIRouter(prefix="/api/agent", tags=["Agent"])
 
 
+DEMO_AGENT_ID = "00000000-0000-0000-0000-000000000001"
+
+
 @router.post("/init")
 def initialize_agent(request: AgentInitRequest):
-    agent_id = str(uuid4())
-    created_at = datetime.now(timezone.utc).isoformat()
-
     connection = get_connection()
     cursor = connection.cursor()
 
     cursor.execute(
         """
-        INSERT INTO agents (agent_id, name, domain, created_at)
-        VALUES (?, ?, ?, ?)
+        SELECT agent_id, name, domain
+        FROM agents
+        WHERE agent_id = ?
         """,
-        (
-            agent_id,
-            request.persona.name,
-            request.persona.domain,
-            created_at
-        )
+        (DEMO_AGENT_ID,)
     )
 
-    connection.commit()
+    agent = cursor.fetchone()
+
+    if not agent:
+        created_at = datetime.now(timezone.utc).isoformat()
+
+        cursor.execute(
+            """
+            INSERT INTO agents (agent_id, name, domain, created_at)
+            VALUES (?, ?, ?, ?)
+            """,
+            (
+                DEMO_AGENT_ID,
+                request.persona.name,
+                request.persona.domain,
+                created_at
+            )
+        )
+
+        connection.commit()
+
+        persona = {
+            "name": request.persona.name,
+            "domain": request.persona.domain
+        }
+    else:
+        persona = {
+            "name": agent["name"],
+            "domain": agent["domain"]
+        }
+
     connection.close()
 
-    persona = {
-        "name": request.persona.name,
-        "domain": request.persona.domain
-    }
-
-    start_agent(agent_id, persona)
+    start_agent(DEMO_AGENT_ID, persona)
 
     return {
-        "agentId": agent_id,
+        "agentId": DEMO_AGENT_ID,
         "status": "initialized"
     }
 
